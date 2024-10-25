@@ -19,8 +19,8 @@ json = {
     ],
     "polygon": [
         {
-            "id": "TODO id",
-            "metadata": "TODO metadata",
+            //"id": "TODO id",
+            //"metadata": "TODO metadata",
             "points": "50,50 25,25 10,20, 40,10"
         }
     ]
