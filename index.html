@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>POC Graph - JSON to SVG</title>
+    <script src='main.js'></script>
+    <style>
+        #graph{
+            width: 700px;
+            height: 400px;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>POC Graph - JSON to SVG</h1>
+    </header>
+    <main>
+        <svg id="graph" viewBox="0 0 100 100">
+            <g id="edge" fill="transparent" stroke="#000"></g>
+            <g id="graph-big-points" fill="red"></g>
+            <g id="graph-small-points" fill="lime"></g>
+        </svg>
+    </main>
+    <script>loadGraph()</script>
+</body>
+</html>
