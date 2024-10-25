@@ -3,6 +3,7 @@
 <head>
     <meta charset='utf-8'>
     <title>POC Graph - JSON to SVG</title>
+    <script src='d3.v7.min.js'></script>
     <script src='main.js'></script>
     <style>
         #graph{
@@ -17,12 +18,12 @@
         <h1>POC Graph - JSON to SVG</h1>
     </header>
     <main>
-        <svg id="graph" viewBox="0 0 100 100">
+        <svg id="graph" viewBox="0 0 1000 1000">
+            <g id="graph-tiles"></g>
             <g id="graph-edges" fill="transparent" stroke="#000"></g>
             <g id="graph-points" fill="red"></g>
-            <g id="graph-tiles"></g>
         </svg>
     </main>
-    <script>loadGraph()</script>
+    <script>loadGraph(generateJsonRandom())</script>
 </body>
 </html>
