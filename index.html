@@ -11,6 +11,13 @@
             height: 400px;
             background-color: #eee;
         }
+        polygon:hover{
+            fill: red;
+        }
+        polygon{
+            stroke: black;
+            stroke-width: 1px;
+        }
     </style>
 </head>
 <body>
@@ -20,7 +27,7 @@
     <main>
         <svg id="graph" viewBox="0 0 1000 1000">
             <g id="graph-tiles"></g>
-            <g id="graph-edges" fill="transparent" stroke="#000"></g>
+            <g id="graph-edges" fill="transparent" stroke="lime"></g>
             <g id="graph-points" fill="red"></g>
         </svg>
     </main>
