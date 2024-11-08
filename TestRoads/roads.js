@@ -100,7 +100,7 @@ function generateJsonRandom() {
     if (centre) {
       for (let i = 0; i < cell.length - 1; i++) {
         const sommetA = cell[i];
-        const sommetB = cell[(i + 1) % cell.length];
+        const sommetB = cell[(i + 1)];
 
         // TODO Si pas besoin de détour (les 2 centre de tuiles en ligne droite, pas besoin de courbe)
         //Si besoin de faire un détour
