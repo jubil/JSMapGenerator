@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>POC Graph - JSON to SVG</title>
+    <script src='../d3.v7.min.js'></script>
+    <script src='roads.js'></script>
+    <style>
+        #graph{
+            width: 700px;
+            height: 400px;
+            background-color: #eee;
+        }
+        polygon:hover{
+            fill: red;
+        }
+        polygon{
+            stroke: black;
+            stroke-width: 0.2px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Test 3 : Curved roads (Cubic Bezier only)</h1>
+    </header>
+    <main>
+        <svg id="graph" viewBox="300 300 500 500">
+            <g id="graph-tiles"></g>
+            <g id="graph-edges" fill="transparent" stroke="lime"></g>
+            <g id="graph-routes" stroke-linecap="round">
+                <g id="graph-routes-layer0" stroke="black" stroke-width="0.9" fill="transparent"></g>
+                <g id="graph-routes-layer1" stroke="tan" stroke-width="0.7" fill="transparent"></g>
+            </g>
+            <g id="graph-points" fill="red" opacity="0"></g>
+        </svg>
+    </main>
+    <script>loadGraph(generateJsonRandom())</script>
+</body>
+</html>
