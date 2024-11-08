@@ -25,12 +25,8 @@ function loadGraph(json) {
       "polygon"
     );
     tile.setAttribute("points", p.points);
-    //tile.setAttribute("stroke", "#F55")
-    tile.setAttribute(
-      "fill",
-      //"#" + Math.floor(Math.random() * 16777215).toString(16)
-      p.color
-    );
+    tile.setAttribute("fill", p.color);
+    tile.setAttribute("stroke", p.color);
     document.getElementById("graph-tiles").appendChild(tile);
   });
 
@@ -100,7 +96,7 @@ function generateJsonRandom() {
     if (centre) {
       for (let i = 0; i < cell.length - 1; i++) {
         const sommetA = cell[i];
-        const sommetB = cell[(i + 1)];
+        const sommetB = cell[i + 1];
 
         // TODO Si pas besoin de détour (les 2 centre de tuiles en ligne droite, pas besoin de courbe)
         //Si besoin de faire un détour
@@ -114,10 +110,10 @@ function generateJsonRandom() {
           centre[1] + 0.2 * (dest[1] - centre[1]),
         ];
 
-        let p3 
-        if(isVertical(sommetA, sommetB)){
+        let p3;
+        if (isVertical(sommetA, sommetB)) {
           p3 = [centre[0] + 0.3 * (dest[0] - centre[0]), dest[1]];
-        }else {
+        } else {
           p3 = [dest[0], centre[1] + 0.3 * (dest[1] - centre[1])];
         }
 
@@ -187,5 +183,12 @@ function checkIntercection(A, B, C, D) {
 }
 
 function isVertical(A, B) {
-  return Math.abs(B[0]-A[0]) < Math.abs(B[1]-A[1])
+  return Math.abs(B[0] - A[0]) < Math.abs(B[1] - A[1]);
+}
+
+function afficherTuiles() {
+  for (let p of document.getElementsByTagName("polygon")) {
+    p.setAttribute("stroke", "black");
+    p.setAttribute("stroke-width", "0.5px");
+  }
 }

@@ -15,8 +15,7 @@
             fill: red;
         }
         polygon{
-            stroke: black;
-            stroke-width: 0.2px;
+            stroke-width: 0.5px;
         }
     </style>
 </head>
@@ -25,12 +24,14 @@
         <h1>Test 3 : Curved roads (Cubic Bezier only)</h1>
     </header>
     <main>
-        <svg id="graph" viewBox="300 300 500 500">
+        <button onclick="afficherTuiles()">Afficher tuiles</button>
+        <br/>
+        <svg id="graph" viewBox="300 300 450 450">
             <g id="graph-tiles"></g>
             <g id="graph-edges" fill="transparent" stroke="lime"></g>
             <g id="graph-routes" stroke-linecap="round">
-                <g id="graph-routes-layer0" stroke="black" stroke-width="0.9" fill="transparent"></g>
-                <g id="graph-routes-layer1" stroke="tan" stroke-width="0.7" fill="transparent"></g>
+                <g id="graph-routes-layer0" stroke="black" stroke-width="1.3" fill="transparent"></g>
+                <g id="graph-routes-layer1" stroke="tan" stroke-width="1" fill="transparent"></g>
             </g>
             <g id="graph-points" fill="red" opacity="0"></g>
         </svg>
