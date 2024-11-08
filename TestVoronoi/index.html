@@ -4,7 +4,7 @@
     <meta charset='utf-8'>
     <title>POC Graph - JSON to SVG</title>
     <script src='../libs/d3.v7.min.js'></script>
-    <script src='roads.js'></script>
+    <script src='main.js'></script>
     <style>
         #graph{
             width: 700px;
@@ -15,25 +15,20 @@
             fill: red;
         }
         polygon{
-            stroke-width: 0.5px;
+            stroke: black;
+            stroke-width: 1px;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Test 3 : Curved roads (Cubic Bezier only)</h1>
+        <h1>POC Graph - JSON to SVG</h1>
     </header>
     <main>
-        <button onclick="afficherTuiles()">Afficher tuiles</button>
-        <br/>
-        <svg id="graph" viewBox="300 300 450 450">
+        <svg id="graph" viewBox="0 0 1000 1000">
             <g id="graph-tiles"></g>
             <g id="graph-edges" fill="transparent" stroke="lime"></g>
-            <g id="graph-routes" stroke-linecap="round">
-                <g id="graph-routes-layer0" stroke="black" stroke-width="1.3" fill="transparent"></g>
-                <g id="graph-routes-layer1" stroke="tan" stroke-width="1" fill="transparent"></g>
-            </g>
-            <g id="graph-points" fill="red" opacity="0"></g>
+            <g id="graph-points" fill="red"></g>
         </svg>
     </main>
     <script>loadGraph(generateJsonRandom())</script>
