@@ -169,19 +169,7 @@ function generateColor(x, y) {
   }
 }
 
-// Vérifie si segment [AB] coupe [CD]
-// usage : checkIntercection([0,0], [0,0], [0,0], [0,0])
-// TODO A test
-function checkIntercection(A, B, C, D) {
-  function subCheckIntercection(a, b, c) {
-    return (c[1] - a[1]) * (b[0] - a[0]) > (b[1] - a[1]) * (c[0] - a[0]);
-  }
-  return (
-    subCheckIntercection(A, C, D) != subCheckIntercection(B, C, D) &&
-    subCheckIntercection(A, B, C) != subCheckIntercection(A, B, D)
-  );
-}
-
+// Vérifie si segment est plus vertical qu'horizontal
 function isVertical(A, B) {
   return Math.abs(B[0] - A[0]) < Math.abs(B[1] - A[1]);
 }
