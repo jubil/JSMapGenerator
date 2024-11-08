@@ -20,10 +20,10 @@ let delimitationCentreTuiles = 0;
     .force("charge", d3.forceManyBody().strength(-50)) //.distanceMin(10).distanceMax(100))
     //.force("collide ", d3.forceCollide(10))
     .force("x", d3.forceX(500).strength(0.2))
-    .force("y", d3.forceY(500).strength(0.2))
-    
-    //simulation.alphaDecay(0.0001)
-    //simulation.velocityDecay(0.1)
+    .force("y", d3.forceY(500).strength(0.2));
+
+  //simulation.alphaDecay(0.0001)
+  //simulation.velocityDecay(0.1)
   //simulation.stop();
 
   // Create the SVG container.
@@ -39,8 +39,7 @@ let delimitationCentreTuiles = 0;
     .selectAll("circle")
     .data(nodes)
     .join("circle")
-    .attr("r", 5)
-
+    .attr("r", 5);
 
   node.call(
     d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended)
@@ -72,7 +71,7 @@ let delimitationCentreTuiles = 0;
   function debug() {
     let delaunay = d3.Delaunay.from(nodes.map((p) => [p.x, p.y]));
     let voronoi = delaunay.voronoi([0, 0, 1000, 1000]);
-    
+
     a = [];
     voronoi.cellPolygons().forEach((cell) => {
       a.push({
@@ -96,18 +95,18 @@ let delimitationCentreTuiles = 0;
       .attr("points", (polygon) => polygon.points)
       .attr("fill", (polygon) => polygon.color)
       .attr("stroke", (polygon) => polygon.color)
-      .attr('stroke-width', delimitationTuiles)
+      .attr("stroke-width", delimitationTuiles);
 
     const node = svg
       .append("g")
-      .attr("fill","red")
+      .attr("fill", "red")
       .selectAll("circle")
       .data(nodes)
       .join("circle")
       .attr("r", delimitationCentreTuiles)
       .attr("cx", (d) => d.x)
-      .attr("cy", (d) => d.y)
-      //.attr("fill", (d) => color(d.group));
+      .attr("cy", (d) => d.y);
+    //.attr("fill", (d) => color(d.group));
 
     setTimeout(() => {
       debug();
@@ -144,63 +143,61 @@ function generateVoronoi(json) {
   return json;
 }
 
-function generateColor(x, y){
-  const distance = Math.sqrt(Math.pow(x - 500, 2) + Math.pow(y - 500, 2))
+function generateColor(x, y) {
+  const distance = Math.sqrt(Math.pow(x - 500, 2) + Math.pow(y - 500, 2));
 
-  const distance2 = Math.sqrt(Math.pow(x - 650, 2) + Math.pow(y - 650, 2))
-  
-  if(distance2 < 50){
-    return "#5555FF"
+  const distance2 = Math.sqrt(Math.pow(x - 650, 2) + Math.pow(y - 650, 2));
+
+  if (distance2 < 50) {
+    return "#5555FF";
   }
-  if(distance2 < 75){
-    return "yellow"
+  if (distance2 < 75) {
+    return "yellow";
   }
-  if(distance < 30){
-    return "#fff"
+  if (distance < 30) {
+    return "#fff";
   }
-  if(distance < 75){
-    return "#ddd"
+  if (distance < 75) {
+    return "#ddd";
   }
-  if(distance < 200 && y > 500){
-    return "#008800"
+  if (distance < 200 && y > 500) {
+    return "#008800";
   }
-  if(distance < 200 && y <= 500 && x > 500){
-    return "yellow"
+  if (distance < 200 && y <= 500 && x > 500) {
+    return "yellow";
   }
-  if(distance < 120 && y <= 500 && x <= 500){
-    return "orange"
+  if (distance < 120 && y <= 500 && x <= 500) {
+    return "orange";
   }
-  if(distance > 120 && distance < 200 && y <= 500 && x <= 500){
-    return "lime"
+  if (distance > 120 && distance < 200 && y <= 500 && x <= 500) {
+    return "lime";
   }
   /*if(x > 200 && x < 800 && y > 200 && y < 800){
     return "#00cc00"
   }*/
-  if(distance < 400){
-    return "#00cc00"
+  if (distance < 400) {
+    return "#00cc00";
   }
-  if(distance < 450 && distance > 400){
-    return "yellow"
+  if (distance < 450 && distance > 400) {
+    return "yellow";
     //return "#5555FF"
-  }
-  else {
-    return "#5555FF"
+  } else {
+    return "#5555FF";
   }
 }
 
-
 function delimitations(size) {
-  if(delimitationTuiles > 0){
-    delimitationTuiles = 0
-  }else {
+  if (delimitationTuiles > 0) {
+    delimitationTuiles = 0;
+  } else {
     delimitationTuiles += size;
   }
 }
 
 function centres() {
-  if(delimitationCentreTuiles > 4){
-    delimitationCentreTuiles = 0
-  }else {
-    delimitationCentreTuiles+=3;
+  if (delimitationCentreTuiles > 4) {
+    delimitationCentreTuiles = 0;
+  } else {
+    delimitationCentreTuiles += 3;
   }
 }
