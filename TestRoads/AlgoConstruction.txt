@@ -1,0 +1,15 @@
+Centre tuile = A
+
+Sommet coté 1 = J
+Sommet coté 2 = K
+Centre coté = C = C((J.x + K.x) / 2; (J.y + K.y) / 2)
+
+
+distance réglable entre 0 et 100% = d = 0.2
+
+Point courbe proche du centre tuile = B = B(a.x + d(C.x-A.x); A.y + d(C.y-A.y))
+Point courbe proche de centre coté = D = D(a.x + 0.5(C.x-A.x);C.y)
+
+
+
+Path SVG : M Ax Ay C Bx By Dx Dy Cx Cy
