@@ -116,9 +116,9 @@ function generateJsonRandom() {
 
         let p3 
         if(isVertical(sommetA, sommetB)){
-          p3 = [centre[0] + 0.5 * (dest[0] - centre[0]), dest[1]];
+          p3 = [centre[0] + 0.3 * (dest[0] - centre[0]), dest[1]];
         }else {
-          p3 = [dest[0], centre[1] + 0.5 * (dest[1] - centre[1])];
+          p3 = [dest[0], centre[1] + 0.3 * (dest[1] - centre[1])];
         }
 
         json.routes.push({
