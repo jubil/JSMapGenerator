@@ -92,7 +92,6 @@ function generateJsonRandom() {
         .replaceAll("]]", ""),
     });
 
-    // TODO WIP
     if (centre) {
       for (let i = 0; i < cell.length - 1; i++) {
         const sommetA = cell[i];
