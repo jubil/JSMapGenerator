@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>POC Graph - JSON to SVG</title>
+    <script src='../libs/d3.v7.min.js'></script>
+    <script src='roads.js'></script>
+    <style>
+        #graph{
+            width: 700px;
+            height: 400px;
+            background-color: #eee;
+        }
+        polygon:hover{
+            fill: red;
+        }
+        polygon{
+            stroke-width: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Test 4 : Routes passant par un centre de gravité des tuiles</h1>
+        <p>(et non par le centre de voronoi)</p>
+    </header>
+    <main>
+        <button onclick="afficherTuiles()">Afficher tuiles</button>
+        <button onclick="document.getElementById('graph-points').setAttribute('opacity', 0.5)">Afficher centres de voronoi</button>
+        <button onclick="graph.requestFullscreen()">Fullscreen</button>
+        <br/>
+        <svg id="graph" viewBox="300 300 450 450">
+            <g id="graph-tiles"></g>
+            <g id="graph-edges" fill="transparent" stroke="lime"></g>
+            <g id="graph-routes" stroke-linecap="round">
+                <g id="graph-routes-layer0" stroke="black" stroke-width="1.3" fill="transparent"></g>
+                <g id="graph-routes-layer1" stroke="tan" stroke-width="1" fill="transparent"></g>
+            </g>
+            <g id="graph-points" fill="red" opacity="0"></g>
+        </svg>
+    </main>
+    <script>loadGraph(generateJsonRandom())</script>
+</body>
+</html>
