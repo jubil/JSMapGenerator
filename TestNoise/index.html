@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>POC Graph - JSON to SVG</title>
+    <script src='../libs/d3.v7.min.js'></script>
+    <script src="../libs/simplexNoise.js"></script>
+    <script src='world.js'></script>
+    <style>
+        #graph {
+            width: 700px;
+            height: 700px;
+            background-color: #eee;
+        }
+
+        #carte svg{
+            position: fixed;
+            top: 0;
+        right: 10px;
+        }
+
+        polygon:hover {
+            fill: rgb(174, 0, 255);
+        }
+
+        polygon {
+            stroke-width: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Test 5 : Tuiles et biomes</h1>
+    </header>
+    <main>
+        <button onclick="afficherTuiles()">Afficher tuiles</button>
+        <button onclick="document.getElementById('graph-points').setAttribute('opacity', 0.7)">Afficher centres de
+            voronoi</button>
+        <button onclick="graph.requestFullscreen()">Fullscreen</button>
+        <br />
+        <h2>Biomes sur tuiles</h2>
+        <div id="carte">
+            <svg id="graph" class="graph" viewBox="0 0 1000 1000">
+                <g id="graph-tiles"></g>
+                <g id="graph-edges" fill="transparent" stroke="lime"></g>
+                <g id="graph-routes" stroke-linecap="round" display="none">
+                    <g id="graph-routes-layer0" stroke="black" stroke-width="1.3" fill="transparent"></g>
+                    <g id="graph-routes-layer1" stroke="tan" stroke-width="1" fill="transparent"></g>
+                </g>
+                <g id="graph-points" fill="red" opacity="0"></g>
+                <g id="graph-noise"></g>
+            </svg>
+        </div>
+        <div id="details-carte">
+            <div>
+                <h2>Biome</h2>
+                <canvas id="graph-biome" width="1000" height="1000"></canvas>
+            </div>
+            <div>
+                <h2>Altitude</h2>
+                <canvas id="graph-altitude" width="1000" height="1000"></canvas>
+            </div>
+            <div>
+                <h2>Temperature</h2>
+                <canvas id="graph-temperature" width="1000" height="1000"></canvas>
+            </div>
+            <div>
+                <h2>Humidité</h2>
+                <canvas id="graph-humidity" width="1000" height="1000"></canvas>
+            </div>
+            <div>
+                <h2>Dangerosité</h2>
+                <canvas id="graph-danger" width="1000" height="1000"></canvas>
+            </div>
+        </div>
+
+    </main>
+    </div>
+    <script>
+        loadGraph(generateJsonRandom())
+        loadDetails()
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+D3 - Mike Bostock - https://d3js.org/
+simplexNoise.js - blindman67 - https://github.com/blindman67/SimplexNoiseJS
