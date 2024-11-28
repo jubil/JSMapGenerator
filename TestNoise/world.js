@@ -182,9 +182,13 @@ function generateJsonRandom() {
     }
   });
 
+  // Force borders
+  forceBorders(0);
+
   return json;
 }
 
+// TODO A SUPPR
 function generateColor(x, y) {
   return (
     "rgb(" +
@@ -247,6 +251,7 @@ function generateNoise(noise, zoomX, zoomY, x, y) {
   return alt;
 }
 
+// TODO Retravailler les biomes
 function determineBiomeTypeID(altitude, temperature, humidity, danger) {
   if (altitude <= 0.35) {
     // OCEAN
@@ -266,6 +271,19 @@ function determineBiomeTypeID(altitude, temperature, humidity, danger) {
     // Plaines
     return 20;
   }
+}
+
+// Transforme tous les bords (0 0 1000 1000) en un biome donné. (0 = Océan)
+function forceBorders(idBiome) {
+  json.tiles.forEach(tuile => {
+    if(tuile.sommets.some(sommet => {
+      return sommet[0] === 0 || sommet[1] === 0 || sommet[0] === 1000 || sommet[1] === 1000
+    })){
+      tuile.biome.biome = idBiome;
+      tuile.color = generateColorFromBiomeId(idBiome)
+    }
+    
+  })
 }
 
 function generateColorFromBiomeId(biomeId) {
