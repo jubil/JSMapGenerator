@@ -69,7 +69,7 @@ function loadGraph(json) {
 }
 
 function generateJsonRandom() {
-  const NB_CASES = 1000;
+  const NB_CASES = 2000;
 
   json = JSON.parse("{}");
 
@@ -245,7 +245,8 @@ function generateJsonRandom() {
   //DEBUG
   let tuileDeVillePotentielles = json.tiles
     .filter((t) => t.biome.id == 20)
-    .filter((t) => t.size > 2000);
+    // 1100 Taille minimum d'une tuile pour accueillir un village
+    .filter((t) => t.size > 1100);
   for (let t of tuileDeVillePotentielles) {
     if (
       tuileDeVillePotentielles
@@ -284,16 +285,9 @@ function isVertical(A, B) {
   return Math.abs(B[0] - A[0]) < Math.abs(B[1] - A[1]);
 }
 
-function afficherTuiles() {
-  for (let p of document.getElementsByTagName("polygon")) {
-    p.setAttribute("stroke", "black");
-    p.setAttribute("stroke-width", "0.5px");
-  }
-}
-
+// Retourne une valeur entre 0 et 1 pour des coordonnées XY données
 function generateNoise(noise, zoomX, zoomY, x, y) {
-  let alt = (noise.noise2D(x / zoomX, y / zoomY) + 1) / 2;
-  return alt;
+  return (noise.noise2D(x / zoomX, y / zoomY) + 1) / 2;
 }
 
 // TODO Retravailler les biomes
@@ -354,7 +348,10 @@ function generateColorFromBiomeId(biomeId) {
   }
 }
 
-// Affichage
+/////////////////////////////////////////////////////////
+/////////////////////// AFFICHAGE ///////////////////////
+/////////////////////////////////////////////////////////
+
 function loadDetails() {
   let graphBiome = document.getElementById("graph-biome").getContext("2d");
   let graphAltitude = document
@@ -466,4 +463,12 @@ function btnChargerLesDetails() {
   setTimeout(() => {
     loadDetails()
   }, 500);
+}
+
+// Méthode d'affichage des contours des tuiles
+function afficherTuiles() {
+  for (let p of document.getElementsByTagName("polygon")) {
+    p.setAttribute("stroke", "black");
+    p.setAttribute("stroke-width", "0.5px");
+  }
 }
