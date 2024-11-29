@@ -8,6 +8,10 @@ const openSimplexDangerousness = openSimplexNoise(seed - 3);
 let delaunay;
 let voronoi;
 
+let zoomSvg = 0;
+let zoomX = 0;
+let zoomY = 0;
+
 function loadGraph(json) {
   console.log("DEBUG JSON", json);
 
@@ -436,3 +440,23 @@ function downloadMapAsJSON() {
   j.href = URL.createObjectURL(new Blob([JSON.stringify(json)]));
   j.click();
 }
+
+//Commandes clavier
+document.addEventListener("keydown", (e) => {
+  console.log(e)
+  if(e.key == '+'){
+      zoomSvg += 20
+  }else if(e.key == '-'){
+      zoomSvg -= 20
+  }else if(e.key == 'z'){
+    zoomY -= 20
+  }else if(e.key == 's'){
+    zoomY += 20
+  }else if(e.key == 'q'){
+    zoomX -= 20
+  }else if(e.key == 'd'){
+    zoomX += 20
+  }
+  
+  document.getElementById("graph").setAttribute("viewBox", (zoomX + zoomSvg) + " " + (zoomY + zoomSvg) + " " + (1000-2*zoomSvg) + " " + (1000-2*zoomSvg))
+});
