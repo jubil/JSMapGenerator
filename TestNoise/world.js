@@ -460,3 +460,11 @@ document.addEventListener("keydown", (e) => {
   
   document.getElementById("graph").setAttribute("viewBox", (zoomX + zoomSvg) + " " + (zoomY + zoomSvg) + " " + (1000-2*zoomSvg) + " " + (1000-2*zoomSvg))
 });
+
+function btnChargerLesDetails() {
+  document.getElementById("details-carte-btn").setAttribute("style", "display:none")
+  document.getElementById("details-carte").removeAttribute("style")
+  setTimeout(() => {
+    loadDetails()
+  }, 500);
+}

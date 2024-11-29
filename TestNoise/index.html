@@ -39,13 +39,13 @@
         <button onclick="document.getElementById('graph-points').setAttribute('opacity', 0.7)">Afficher centres de
             voronoi</button>
         <button onclick="graph.requestFullscreen()">Fullscreen</button>
-        <button onclick="downloadMapAsJSON()">Download Map</button>
+        <button onclick="downloadMapAsJSON()">Download JSON</button>
         
         <br />
         <h2>Biomes sur tuiles</h2>
-        <p>ZQSD/WASD pour déplacer la caméra</p>
-        <p>Zoom : "+" et "-"</p>
-        <p>Tuiles vertes claires sont des endroit potentiels pour générer les prémières villes / les premiers villages</p>
+        <p>ZQSD/WASD pour déplacer la caméra.</p>
+        <p>Zoom : "+" et "-".</p>
+        <p>Tuiles vertes claires sont des endroit potentiels pour générer les prémières villes / les premiers villages.</p>
         <div id="carte">
             <svg id="graph" class="graph" viewBox="0 0 1000 1000">
                 <g id="graph-tiles"></g>
@@ -58,9 +58,12 @@
                 <g id="graph-noise"></g>
             </svg>
         </div>
-        <div id="details-carte">
+        <div id="details-carte-btn">
+            <button onclick="btnChargerLesDetails()" style="padding: 20px">Charger les détails (Désolé pour les performances désastreuses ^^)</button>
+        </div>
+        <div id="details-carte" style="display: none;">
             <div>
-                <h2>Biome</h2>
+                <h2>Biomes</h2>
                 <canvas id="graph-biome" width="1000" height="1000"></canvas>
             </div>
             <div>
@@ -85,7 +88,6 @@
     </div>
     <script>
         loadGraph(generateJsonRandom())
-        loadDetails()
     </script>
 </body>
 
