@@ -448,11 +448,11 @@ document.addEventListener("keydown", (e) => {
       zoomSvg += 20
   }else if(e.key == '-'){
       zoomSvg -= 20
-  }else if(e.key == 'z'){
+  }else if(e.key == 'z' || e.key == 'w'){
     zoomY -= 20
   }else if(e.key == 's'){
     zoomY += 20
-  }else if(e.key == 'q'){
+  }else if(e.key == 'q' || e.key == 'a'){
     zoomX -= 20
   }else if(e.key == 'd'){
     zoomX += 20
