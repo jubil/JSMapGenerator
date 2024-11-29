@@ -5,6 +5,9 @@ const openSimplexTemperature = openSimplexNoise(seed - 1);
 const openSimplexHumidity = openSimplexNoise(seed - 2);
 const openSimplexDangerousness = openSimplexNoise(seed - 3);
 
+let delaunay;
+let voronoi;
+
 function loadGraph(json) {
   console.log("DEBUG JSON", json);
 
@@ -31,6 +34,7 @@ function loadGraph(json) {
       "http://www.w3.org/2000/svg",
       "polygon"
     );
+    tile.setAttribute("tuile", p.id);
     tile.setAttribute("points", p.path);
     tile.setAttribute("fill", p.color);
     tile.setAttribute("stroke", p.color);
@@ -84,9 +88,9 @@ function generateJsonRandom() {
     });
   }
 
-  const delaunay = d3.Delaunay.from(json.points.map((p) => [p.x, p.y]));
-  //const voronoi = delaunay.voronoi([-1000000, -1000000, 1000000, 1000000]);
-  const voronoi = delaunay.voronoi([0, 0, 1000, 1000]);
+  delaunay = d3.Delaunay.from(json.points.map((p) => [p.x, p.y]));
+  voronoi = delaunay.voronoi([0, 0, 1000, 1000]);
+  //voronoi = delaunay.voronoi([-1000000, -1000000, 1000000, 1000000]);
 
   voronoi.cellPolygons().forEach((cell) => {
     let centre = [0, 0];
@@ -126,18 +130,17 @@ function generateJsonRandom() {
     );
     let biome = determineBiomeTypeID(
       altitude,
-      humidity,
       temperature,
+      humidity,
       dangerousness
     );
 
     json.tiles.push({
       id: cell.index,
-      //color: generateColor(cell[0][0], cell[0][1]),
       color: generateColorFromBiomeId(biome),
       centre: centre,
       biome: {
-        biome: biome,
+        id: biome,
         altitude: altitude,
         temperature: temperature,
         humidity: humidity,
@@ -150,46 +153,117 @@ function generateJsonRandom() {
       sommets: cell.slice(),
     });
 
-    for (let i = 0; i < cell.length - 1; i++) {
-      const sommetA = cell[i];
-      const sommetB = cell[i + 1];
+    // Générer des routes sur toutes les tuiles de plaines
+    // TODO A Refaire
+    if (biome == 20) {
+      for (let i = 0; i < cell.length - 1; i++) {
+        const sommetA = cell[i];
+        const sommetB = cell[i + 1];
 
-      // TODO Si pas besoin de détour (les 2 centre de tuiles en ligne droite, pas besoin de courbe)
-      //Si besoin de faire un détour
-      let dest = [
-        sommetA[0] + 0.5 * (sommetB[0] - sommetA[0]),
-        sommetA[1] + 0.5 * (sommetB[1] - sommetA[1]),
-      ];
+        // TODO Si pas besoin de détour (les 2 centre de tuiles en ligne droite, pas besoin de courbe)
+        //Si besoin de faire un détour
+        let dest = [
+          sommetA[0] + 0.5 * (sommetB[0] - sommetA[0]),
+          sommetA[1] + 0.5 * (sommetB[1] - sommetA[1]),
+        ];
 
-      let p2 = [
-        centre[0] + 0.2 * (dest[0] - centre[0]),
-        centre[1] + 0.2 * (dest[1] - centre[1]),
-      ];
+        let p2 = [
+          centre[0] + 0.2 * (dest[0] - centre[0]),
+          centre[1] + 0.2 * (dest[1] - centre[1]),
+        ];
 
-      let p3;
-      if (isVertical(sommetA, sommetB)) {
-        p3 = [centre[0] + 0.3 * (dest[0] - centre[0]), dest[1]];
-      } else {
-        p3 = [dest[0], centre[1] + 0.3 * (dest[1] - centre[1])];
+        let p3;
+        if (isVertical(sommetA, sommetB)) {
+          p3 = [centre[0] + 0.3 * (dest[0] - centre[0]), dest[1]];
+        } else {
+          p3 = [dest[0], centre[1] + 0.3 * (dest[1] - centre[1])];
+        }
+
+        json.routes.push({
+          p1: centre,
+          p2: p2,
+          p3: p3,
+          p4: dest,
+        });
       }
-
-      json.routes.push({
-        p1: centre,
-        p2: p2,
-        p3: p3,
-        p4: dest,
-      });
     }
   });
 
-  // Force borders
-  forceBorders(0);
+  // Force borders (0 = Océan || 10 = Montagne)
+  // forceBorders(0);
+
+  // Calcul la taille des tuiles
+  json.tiles.forEach((t) => {
+    t.size = Math.abs(d3.polygonArea(t.sommets));
+  });
+
+  // Calcul voisin
+  json.tiles.forEach((t) => {
+    t.neighbors = Array.from(voronoi.neighbors(t.id)).map((id) => {
+      let voisin = json.tiles.filter((t2) => t2.id == id)[0];
+      return {
+        id: id,
+        biome: voisin.biome.id,
+        distance: "TODO",
+        segmentSeparation: [
+          ["SommetA x", "SommetA y"],
+          ["SommetB x", "SommetB y"],
+        ],
+        centreSegmentSeparation: ["TODO x", "TODO y"],
+      };
+    });
+  });
+
+  //DEBUG
+  // Plus grosse tuile de plaine en vert
+  /*   tmp = json.tiles
+    .filter((t) => t.biome.id == 20)
+    .sort((a, b) => {
+      return b.size - a.size;
+    });
+  tmp[0].color = "lime";
+  tmp[1].color = "lime";
+  tmp[2].color = "lime";
+  tmp[3].color = "lime";
+  tmp[4].color = "lime";
+  // Plus petite tuile de plaine en jaune
+  tmp = json.tiles
+    .filter((t) => t.biome.id == 20)
+    .sort((a, b) => {
+      return a.size - b.size;
+    });
+  tmp[0].color = "yellow";
+  tmp[1].color = "yellow";
+  tmp[2].color = "yellow";
+  tmp[3].color = "yellow";
+  tmp[4].color = "yellow"; */
+
+  //DEBUG
+  let tuileDeVillePotentielles = json.tiles
+    .filter((t) => t.biome.id == 20)
+    .filter((t) => t.size > 2000);
+  for (let t of tuileDeVillePotentielles) {
+    if (
+      tuileDeVillePotentielles
+        .filter((x) => x !== t)
+        .map((x) => x.neighbors.map((n) => n.id))
+        .flat()
+        .includes(t.id)
+    ) {
+      tuileDeVillePotentielles = tuileDeVillePotentielles.filter(
+        (x) => x !== t
+      );
+    }
+  }
+  tuileDeVillePotentielles.forEach((t) => {
+    t.color = "lime";
+  });
 
   return json;
 }
 
 // TODO A SUPPR
-function generateColor(x, y) {
+function generateRandomColor() {
   return (
     "rgb(" +
     Math.trunc(Math.random() * 255) +
@@ -199,39 +273,6 @@ function generateColor(x, y) {
     Math.trunc(Math.random() * 255) +
     ")"
   );
-
-  if (distance2 < 50) {
-    return "#5555FF";
-  }
-  if (distance2 < 75) {
-    return "yellow";
-  }
-  if (distance < 30) {
-    return "#fff";
-  }
-  if (distance < 75) {
-    return "#ddd";
-  }
-  if (distance < 200 && y > 500) {
-    return "#008800";
-  }
-  if (distance < 200 && y <= 500 && x > 500) {
-    return "yellow";
-  }
-  if (distance < 120 && y <= 500 && x <= 500) {
-    return "orange";
-  }
-  if (distance > 120 && distance < 200 && y <= 500 && x <= 500) {
-    return "lime";
-  }
-  if (distance < 350) {
-    return "#00cc00";
-  }
-  if (distance < 400 && distance > 350) {
-    return "yellow";
-  } else {
-    return "#5555FF";
-  }
 }
 
 // Vérifie si segment est plus vertical qu'horizontal
@@ -258,7 +299,7 @@ function determineBiomeTypeID(altitude, temperature, humidity, danger) {
     return 0;
   } else if (altitude > 0.7) {
     if (altitude > 0.85) {
-      if (temperature > 0.6) {
+      if (temperature > 0.65) {
         // Volcan
         return 12;
       }
@@ -275,15 +316,21 @@ function determineBiomeTypeID(altitude, temperature, humidity, danger) {
 
 // Transforme tous les bords (0 0 1000 1000) en un biome donné. (0 = Océan)
 function forceBorders(idBiome) {
-  json.tiles.forEach(tuile => {
-    if(tuile.sommets.some(sommet => {
-      return sommet[0] === 0 || sommet[1] === 0 || sommet[0] === 1000 || sommet[1] === 1000
-    })){
-      tuile.biome.biome = idBiome;
-      tuile.color = generateColorFromBiomeId(idBiome)
+  json.tiles.forEach((tuile) => {
+    if (
+      tuile.sommets.some((sommet) => {
+        return (
+          sommet[0] === 0 ||
+          sommet[1] === 0 ||
+          sommet[0] === 1000 ||
+          sommet[1] === 1000
+        );
+      })
+    ) {
+      tuile.biome.id = idBiome;
+      tuile.color = generateColorFromBiomeId(idBiome);
     }
-    
-  })
+  });
 }
 
 function generateColorFromBiomeId(biomeId) {
@@ -381,4 +428,11 @@ function generateGraphColorDanger(x, y) {
     ((openSimplexDangerousness.noise2D(x / zoom, y / zoom) + 1) / 2) * 255
   );
   return "rgb(" + 255 + "," + (255 - danger) + "," + (255 - danger) + ")";
+}
+
+function downloadMapAsJSON() {
+  let j = document.createElement("a");
+  j.download = "Map.json";
+  j.href = URL.createObjectURL(new Blob([JSON.stringify(json)]));
+  j.click();
 }
