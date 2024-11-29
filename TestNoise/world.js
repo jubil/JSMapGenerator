@@ -443,7 +443,6 @@ function downloadMapAsJSON() {
 
 //Commandes clavier
 document.addEventListener("keydown", (e) => {
-  console.log(e)
   if(e.key == '+'){
       zoomSvg += 20
   }else if(e.key == '-'){
