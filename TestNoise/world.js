@@ -13,8 +13,9 @@ let zoomX = 0;
 let zoomY = 0;
 
 function loadGraph(json) {
-  console.log("DEBUG JSON", json);
-
+  console.log("Loading JSON", json);
+  cleanGraphSVG();
+  
   json.points.forEach((p) => {
     let node = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     node.setAttribute("cx", p.x);
@@ -157,9 +158,9 @@ function generateJsonRandom() {
       sommets: cell.slice(),
     });
 
+    // TODO A Suppr
     // Générer des routes sur toutes les tuiles de plaines
-    // TODO A Refaire
-    if (biome == 20) {
+/*     if (biome == 20) {
       for (let i = 0; i < cell.length - 1; i++) {
         const sommetA = cell[i];
         const sommetB = cell[i + 1];
@@ -190,57 +191,54 @@ function generateJsonRandom() {
           p4: dest,
         });
       }
-    }
+    } */
   });
-
-  // Force borders (0 = Océan || 10 = Montagne)
-  // forceBorders(0);
 
   // Calcul la taille des tuiles
   json.tiles.forEach((t) => {
     t.size = Math.abs(d3.polygonArea(t.sommets));
   });
 
+  // Force borders (0 = Océan || 10 = Montagne)
+  // forceBorders(0);
+
   // Calcul voisin
   json.tiles.forEach((t) => {
     t.neighbors = Array.from(voronoi.neighbors(t.id)).map((id) => {
       let voisin = json.tiles.filter((t2) => t2.id == id)[0];
+
+      let segmentSeparation = voisin.sommets.flatMap(sommetVoisin => {
+        return t.sommets.map(sommetTuile => {
+          return {
+            s1: sommetTuile,
+            s2: sommetVoisin,
+            d: calculDistance(sommetTuile[0], sommetTuile[1], sommetVoisin[0], sommetVoisin[1])
+          }
+        }).filter(d => d.d == 0)
+      });
+
+      if(segmentSeparation.length == 1){
+        // Quand les tuiles se touchent par le sommet
+        segmentSeparation = [segmentSeparation[0].s1, segmentSeparation[0].s1]
+      }else if(segmentSeparation.length >= 2){
+        // Quand les tuiles se touchant par un coté
+        segmentSeparation = [segmentSeparation[0].s1, segmentSeparation[1].s1]
+      }
+      else {
+        // Erreur ne devrais pas arriver (erreur bloquante)
+        // TODO Vérifier si la cas des voisins qui ne se touchent pas se produit ou pas
+        console.error("Erreur dans le calcul de la séparation entre 2 tuiles voisines car les tuiles ne se touchant pas. erreur segmentSeparation", t, voisin, segmentSeparation)
+      }
+
       return {
         id: id,
         biome: voisin.biome.id,
-        distance: "TODO",
-        segmentSeparation: [
-          ["SommetA x", "SommetA y"],
-          ["SommetB x", "SommetB y"],
-        ],
-        centreSegmentSeparation: ["TODO x", "TODO y"],
+        distance: calculDistance(t.centre[0], t.centre[1], voisin.centre[0], voisin.centre[1]),
+        segmentSeparation: segmentSeparation,
+        centreSegmentSeparation: calculCentre(segmentSeparation[0][0],segmentSeparation[0][1],segmentSeparation[1][0],segmentSeparation[1][1])
       };
     });
   });
-
-  //DEBUG
-  // Plus grosse tuile de plaine en vert
-  /*   tmp = json.tiles
-    .filter((t) => t.biome.id == 20)
-    .sort((a, b) => {
-      return b.size - a.size;
-    });
-  tmp[0].color = "lime";
-  tmp[1].color = "lime";
-  tmp[2].color = "lime";
-  tmp[3].color = "lime";
-  tmp[4].color = "lime";
-  // Plus petite tuile de plaine en jaune
-  tmp = json.tiles
-    .filter((t) => t.biome.id == 20)
-    .sort((a, b) => {
-      return a.size - b.size;
-    });
-  tmp[0].color = "yellow";
-  tmp[1].color = "yellow";
-  tmp[2].color = "yellow";
-  tmp[3].color = "yellow";
-  tmp[4].color = "yellow"; */
 
   //DEBUG
   let tuileDeVillePotentielles = json.tiles
@@ -348,6 +346,52 @@ function generateColorFromBiomeId(biomeId) {
   }
 }
 
+function createSemiRoad(idTuile, idVoisin) {
+  const centre = json.tiles.filter((t) => t.id == idTuile)[0].centre;
+  const dest = json.tiles.filter((t) => t.id == idTuile)[0].neighbors.filter((n) => n.id == idVoisin)[0].centreSegmentSeparation;
+
+  let p2 = [
+    centre[0] + 0.2 * (dest[0] - centre[0]),
+    centre[1] + 0.2 * (dest[1] - centre[1]),
+  ];
+
+  let p3;
+  sommetA = json.tiles.filter((t) => t.id == idTuile)[0].neighbors.filter((n) => n.id == idVoisin)[0].segmentSeparation[0]
+  sommetB = json.tiles.filter((t) => t.id == idTuile)[0].neighbors.filter((n) => n.id == idVoisin)[0].segmentSeparation[1]
+  if (isVertical(sommetA, sommetB)) {
+    p3 = [centre[0] + 0.3 * (dest[0] - centre[0]), dest[1]];
+  } else {
+    p3 = [dest[0], centre[1] + 0.3 * (dest[1] - centre[1])];
+  }
+
+  json.routes.push({
+    p1: centre,
+    p2: p2,
+    p3: p3,
+    p4: dest,
+  });
+}
+
+function createRoad(idTuile, idVoisin){
+  createSemiRoad(idTuile, idVoisin)
+  createSemiRoad(idVoisin, idTuile)
+}
+
+
+function createLongRoad(...idTuiles) {
+  for (let index = 0; index < idTuiles.length-1; index++) {
+    createRoad(idTuiles[index], idTuiles[index+1])
+  }
+}
+
+function calculDistance(x1, y1, x2, y2) {
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+function calculCentre(x1, y1, x2, y2) {
+  return [0.5 * (x1 + x2), 0.5 * (y1 + y2)];
+}
+
 /////////////////////////////////////////////////////////
 /////////////////////// AFFICHAGE ///////////////////////
 /////////////////////////////////////////////////////////
@@ -440,28 +484,42 @@ function downloadMapAsJSON() {
 
 //Commandes clavier
 document.addEventListener("keydown", (e) => {
-  if(e.key == '+'){
-      zoomSvg += 20
-  }else if(e.key == '-'){
-      zoomSvg -= 20
-  }else if(e.key == 'z' || e.key == 'w'){
-    zoomY -= 20
-  }else if(e.key == 's'){
-    zoomY += 20
-  }else if(e.key == 'q' || e.key == 'a'){
-    zoomX -= 20
-  }else if(e.key == 'd'){
-    zoomX += 20
+  if (e.key == "+") {
+    zoomSvg += 20;
+  } else if (e.key == "-") {
+    zoomSvg -= 20;
+  } else if (e.key == "z" || e.key == "w") {
+    zoomY -= 20;
+  } else if (e.key == "s") {
+    zoomY += 20;
+  } else if (e.key == "q" || e.key == "a") {
+    zoomX -= 20;
+  } else if (e.key == "d") {
+    zoomX += 20;
   }
-  
-  document.getElementById("graph").setAttribute("viewBox", (zoomX + zoomSvg) + " " + (zoomY + zoomSvg) + " " + (1000-2*zoomSvg) + " " + (1000-2*zoomSvg))
+
+  document
+    .getElementById("graph")
+    .setAttribute(
+      "viewBox",
+      zoomX +
+        zoomSvg +
+        " " +
+        (zoomY + zoomSvg) +
+        " " +
+        (1000 - 2 * zoomSvg) +
+        " " +
+        (1000 - 2 * zoomSvg)
+    );
 });
 
 function btnChargerLesDetails() {
-  document.getElementById("details-carte-btn").setAttribute("style", "display:none")
-  document.getElementById("details-carte").removeAttribute("style")
+  document
+    .getElementById("details-carte-btn")
+    .setAttribute("style", "display:none");
+  document.getElementById("details-carte").removeAttribute("style");
   setTimeout(() => {
-    loadDetails()
+    loadDetails();
   }, 500);
 }
 
@@ -472,3 +530,19 @@ function afficherTuiles() {
     p.setAttribute("stroke-width", "0.5px");
   }
 }
+
+function paintTile(idTile, color){
+  if(!color){
+    color = "yellow"
+  }
+  Array.from(document.getElementsByTagName("polygon")).filter(p => p.getAttribute("tuile") == idTile)[0].setAttribute("fill", color)
+}
+
+// A Refacto, drop all and recreate <g> tags
+function cleanGraphSVG() {
+  document.getElementById("graph-tiles").innerHTML = "";
+  document.getElementById("graph-routes-layer0").innerHTML = "";
+  document.getElementById("graph-routes-layer1").innerHTML = "";
+  document.getElementById("graph-points").innerHTML = "";
+}
+
