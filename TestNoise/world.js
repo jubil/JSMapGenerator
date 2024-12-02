@@ -205,7 +205,7 @@ function generateJsonRandom() {
     });
   });
 
-  //DEBUG
+  //DEBUG villes potentielles
   let tuileDeVillePotentielles = json.tiles
     .filter((t) => t.biome.id == 20)
     // 1100 Taille minimum d'une tuile pour accueillir un village
@@ -224,7 +224,8 @@ function generateJsonRandom() {
     }
   }
   tuileDeVillePotentielles.forEach((t) => {
-    t.color = "lime";
+    t.biome = 21
+    t.color = generateColorFromBiomeId(t.biome);
   });
 
   // DEBUG créer quelques routes pour relier les villages
@@ -232,7 +233,7 @@ function generateJsonRandom() {
     createLongRoad(pathfinding(tuileDeVillePotentielles[i].id, tuileDeVillePotentielles[(i+1)%tuileDeVillePotentielles.length].id, [20] ));
   }*/
 
-  // Relier tous les villages
+  // TODO A Suppr, Relier tous les villages (Pas opti = lag)
   /* tuileDeVillePotentielles.forEach(v1 => {
     tuileDeVillePotentielles.forEach(v2 => {
       if(v1 != v2){
@@ -300,7 +301,7 @@ function generateNoise(noise, zoomX, zoomY, x, y) {
 
 // TODO Retravailler les biomes
 function determineBiomeTypeID(altitude, temperature, humidity, danger) {
-  if (altitude <= 0.35) {
+  if (altitude <= 0.25) {
     // OCEAN
     return 0;
   } else if (altitude > 0.7) {
@@ -342,15 +343,23 @@ function forceBorders(idBiome) {
 function generateColorFromBiomeId(biomeId) {
   switch (biomeId) {
     case 0:
+      // OCEAN
       return "#00f";
     case 10:
+      // Montagne
       return "#ddd";
     case 11:
+      // Montagne haute (neige)
       return "#fff";
     case 12:
+      // Volcan
       return "#f00";
     case 20:
+      // Plaines
       return "#00cc00";
+    case 21: 
+      // Village
+      return "lime";
     default:
       return "#ff00ff";
   }
