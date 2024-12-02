@@ -301,7 +301,7 @@ function generateNoise(noise, zoomX, zoomY, x, y) {
 
 // TODO Retravailler les biomes
 function determineBiomeTypeID(altitude, temperature, humidity, danger) {
-  if (altitude <= 0.25) {
+  if (altitude <= 0.32) {
     // OCEAN
     return 0;
   } else if (altitude > 0.7) {
