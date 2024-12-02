@@ -16,10 +16,10 @@
             background-color: #eee;
         }
 
-        #carte svg{
+        #carte svg {
             position: fixed;
             top: 0;
-        right: 10px;
+            right: 10px;
         }
 
         polygon:hover {
@@ -27,7 +27,8 @@
         }
 
         polygon {
-            stroke-width: 1px;
+            /* stroke-width: 0.05px; */
+            stroke-width: 2px;
         }
     </style>
 </head>
@@ -42,13 +43,14 @@
             voronoi</button>
         <button onclick="graph.requestFullscreen()">Fullscreen</button>
         <button onclick="downloadMapAsJSON()">Download JSON</button>
-        
+
         <br />
         <h2>Biomes sur tuiles</h2>
         <p>F5 pour générer un nouveau monde.</p>
         <p>ZQSD/WASD pour déplacer la caméra.</p>
         <p>Zoom : "+" et "-".</p>
-        <p>Tuiles vertes claires sont des endroit potentiels pour générer les prémières villes / les premiers villages.</p>
+        <p>Tuiles vertes claires sont des endroit potentiels pour générer les prémières villes / les premiers villages.
+        </p>
         <div id="carte">
             <svg id="graph" class="graph" viewBox="0 0 1000 1000">
                 <g id="graph-tiles"></g>
@@ -60,7 +62,8 @@
             </svg>
         </div>
         <div id="details-carte-btn">
-            <button onclick="btnChargerLesDetails()" style="padding: 20px">Charger les détails (Désolé pour les performances désastreuses ^^)</button>
+            <button onclick="btnChargerLesDetails()" style="padding: 20px">Charger les détails (Désolé pour les
+                performances désastreuses ^^)</button>
         </div>
         <div id="details-carte" style="display: none;">
             <div>
