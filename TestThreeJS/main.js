@@ -1,6 +1,5 @@
 import * as THREE from "../libs/three/three.module.js";
 import { VOXLoader, VOXMesh } from "../libs/three/addons/loaders/VOXLoader.js";
-import { Sky } from "../libs/three/addons/objects/Sky.js";
 
 let FOV = 80;
 
@@ -80,7 +79,7 @@ textureCiel.wrapS = THREE.RepeatWrapping;
 textureCiel.wrapT = THREE.RepeatWrapping;
 textureCiel.repeat.set(1, 1);
 const sphereCiel = new THREE.Mesh(
-  new THREE.SphereGeometry(900, 100, 100),
+  new THREE.SphereGeometry(950, 3, 3),
   new THREE.MeshBasicMaterial({
     map: textureCiel,
     side: THREE.BackSide,
