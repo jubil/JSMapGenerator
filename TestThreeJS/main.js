@@ -22,7 +22,7 @@ const geometry = new THREE.BoxGeometry(1, 1, 1);
 const texture = new THREE.TextureLoader().load( "texture.png" );
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
-texture.repeat.set( 0.5, 0.5 );
+texture.repeat.set( 4, 4 );
 
 const material = new THREE.MeshBasicMaterial({
   map: texture,
