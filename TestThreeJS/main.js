@@ -53,26 +53,36 @@ scene.add(dirLight);
 
 const loader = new VOXLoader();
 
+let meshVOX;
 loader.load("1.vox", function (chunks) {
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
 
-    const mesh = new VOXMesh(chunk);
-    mesh.scale.setScalar(0.5);
-    mesh.position.z = -10;
+    meshVOX = new VOXMesh(chunk);
+    meshVOX.scale.setScalar(0.5);
+    meshVOX.position.z = -10;
+    meshVOX.position.y = 0;
     
-    scene.add(mesh);
+    scene.add(meshVOX);
   }
 });
 
-camera.position.z = 5;
 camera.position.x = -10;
+camera.position.y = 0
+camera.position.z = 5;
+let i = 0;
 function animate() {
+  i++
   renderer.render(scene, camera);
   cube.rotation.x += 0.001;
   cube.rotation.y += 0.01;
   camera.rotateY(-0.001)
   
+  if(meshVOX && i % 200 == 0){
+    i = 0;
+    meshVOX.material.wireframe = !meshVOX.material.wireframe;
+  }
+
   if(camera.rotation.y < -1.3){
     camera.rotation.y = 0.9
   }
