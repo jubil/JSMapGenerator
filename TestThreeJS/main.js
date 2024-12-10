@@ -86,16 +86,31 @@ function animate() {
   renderer.render(scene, camera);
   cube.rotation.x += 0.001;
   cube.rotation.y += 0.01;
-  camera.rotateY(-0.001)
+  //camera.rotateY(-0.001)
   
   if(meshVOX && i % 200 == 0){
     i = 0;
     meshVOX.material.wireframe = !meshVOX.material.wireframe;
   }
 
-  if(camera.rotation.y < -1.3){
+/*   if(camera.rotation.y < -1.3){
     camera.rotation.y = 0.9
-  }
+  } */
 }
 renderer.setAnimationLoop(animate);
 
+document.addEventListener("keypress", event => {
+  if(event.key == 'z'){
+    camera.position.z -= 1
+  }if(event.key == 'q'){
+    camera.position.x -= 1
+  }if(event.key == 's'){
+    camera.position.z += 1
+  }if(event.key == 'd'){
+    camera.position.x += 1
+  }if(event.key == 'e'){
+    camera.rotation.y -= Math.PI/64
+  }if(event.key == 'a'){
+    camera.rotation.y += Math.PI/8
+  }
+})
