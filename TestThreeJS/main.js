@@ -28,6 +28,9 @@ const material = new THREE.MeshBasicMaterial({
   map: texture,
 });
 const cube = new THREE.Mesh(geometry, material);
+cube.position.x = 5
+cube.position.y = 6
+cube.position.z = 5
 scene.add(cube);
 
 let cube2 = new THREE.Mesh(
@@ -35,7 +38,7 @@ let cube2 = new THREE.Mesh(
   new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
 );
 cube2.position.z = 2;
-cube2.position.y = 1;
+cube2.position.y = 15;
 cube2.rotateY(0.2);
 scene.add(cube2);
 
@@ -59,16 +62,23 @@ loader.load("1.vox", function (chunks) {
     const chunk = chunks[i];
 
     meshVOX = new VOXMesh(chunk);
-    meshVOX.scale.setScalar(0.5);
+    meshVOX.scale.setScalar(1);
     meshVOX.position.z = -10;
-    meshVOX.position.y = 0;
-    
+    meshVOX.position.y = chunk.size.y/2-1
+
+    console.log(chunk)
+    console.log(meshVOX)
+
     scene.add(meshVOX);
   }
 });
 
+scene.add( new THREE.GridHelper( 100, 100 ) );
+//scene.add( new THREE.AxesHelper( 5 ) );
+
+
 camera.position.x = -10;
-camera.position.y = 0
+camera.position.y = 10
 camera.position.z = 5;
 let i = 0;
 function animate() {
