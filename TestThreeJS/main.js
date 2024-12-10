@@ -19,16 +19,20 @@ document.body.appendChild(renderer.domElement);
 
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 
+const texture = new THREE.TextureLoader().load( "texture.png" );
+texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+texture.repeat.set( 0.5, 0.5 );
+
 const material = new THREE.MeshBasicMaterial({
-  color: 0xff0000,
-  wireframe: true,
+  map: texture,
 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
 let cube2 = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+  new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
 );
 cube2.position.z = 2;
 cube2.position.y = 1;
@@ -48,6 +52,7 @@ dirLight.position.set(1.5, 3, 2.5);
 scene.add(dirLight);
 
 const loader = new VOXLoader();
+
 loader.load("1.vox", function (chunks) {
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
@@ -55,6 +60,7 @@ loader.load("1.vox", function (chunks) {
     const mesh = new VOXMesh(chunk);
     mesh.scale.setScalar(0.5);
     mesh.position.z = -10;
+    
     scene.add(mesh);
   }
 });
@@ -66,8 +72,7 @@ function animate() {
   cube.rotation.x += 0.001;
   cube.rotation.y += 0.01;
   camera.rotateY(-0.001)
-  //camera.setRotationFromEuler()
-  console.log(camera.rotation.y)
+  
   if(camera.rotation.y < -1.3){
     camera.rotation.y = 0.9
   }
