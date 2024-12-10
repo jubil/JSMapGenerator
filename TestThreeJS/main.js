@@ -1,5 +1,6 @@
 import * as THREE from "../libs/three/three.module.js";
 import { VOXLoader, VOXMesh } from "../libs/three/addons/loaders/VOXLoader.js";
+import { Sky } from '../libs/three/addons/objects/Sky.js';
 
 let FOV = 80;
 
@@ -73,9 +74,26 @@ loader.load("1.vox", function (chunks) {
   }
 });
 
+// sky
+const textureCiel = new THREE.TextureLoader().load( "sky.jpg" );
+textureCiel.wrapS = THREE.RepeatWrapping;
+textureCiel.wrapT = THREE.RepeatWrapping;
+textureCiel.repeat.set( 1, 1 );
+const sphereCiel = new THREE.Mesh(
+  new THREE.SphereGeometry(900, 100, 100),
+  new THREE.MeshBasicMaterial({
+    map: textureCiel,
+    side: THREE.BackSide
+  })
+);
+scene.add(sphereCiel);
+
+// helpers
 scene.add( new THREE.GridHelper( 100, 100 ) );
 //scene.add( new THREE.AxesHelper( 5 ) );
 
+
+// render
 
 camera.position.x = -10;
 camera.position.y = 10
@@ -87,15 +105,16 @@ function animate() {
   cube.rotation.x += 0.001;
   cube.rotation.y += 0.01;
   //camera.rotateY(-0.001)
-  
+
+  sphereCiel.position.x = camera.position.x
+sphereCiel.position.y = camera.position.y
+sphereCiel.position.z = camera.position.z
+
   if(meshVOX && i % 200 == 0){
     i = 0;
     meshVOX.material.wireframe = !meshVOX.material.wireframe;
   }
 
-/*   if(camera.rotation.y < -1.3){
-    camera.rotation.y = 0.9
-  } */
 }
 renderer.setAnimationLoop(animate);
 
@@ -111,6 +130,6 @@ document.addEventListener("keypress", event => {
   }if(event.key == 'e'){
     camera.rotation.y -= Math.PI/64
   }if(event.key == 'a'){
-    camera.rotation.y += Math.PI/8
+    camera.rotation.y += Math.PI/64
   }
 })
