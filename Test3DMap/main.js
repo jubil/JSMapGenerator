@@ -198,8 +198,9 @@ function drawMap(scene, json) {
     scene.add(mesh);
   });
 
+  // Trace les routes
   json.routes.forEach(route => {
-    const hauteurRoutes = 0.05
+    const hauteurRoutes = 0.01
     const curve = new THREE.CubicBezierCurve3(
       new THREE.Vector3( route.p1[0], hauteurRoutes, route.p1[1] ),
       new THREE.Vector3( route.p2[0], hauteurRoutes, route.p2[1] ),
@@ -214,7 +215,6 @@ function drawMap(scene, json) {
       color: 0xffff00
   } );
     
-    // Create the final object to add to the scene
     const curveObject = new THREE.Line( geometry, material );
     console.log(curveObject)
     scene.add(curveObject)
