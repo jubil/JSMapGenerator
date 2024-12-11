@@ -123,7 +123,6 @@ export class CharacterControls {
     // move model
     const moveX = this.walkDirection.x * velocity * delta
     const moveZ = this.walkDirection.z * velocity * delta
-    console.log(moveX, moveZ)
     
     this.model.position.x += moveX
     this.model.position.z += moveZ
