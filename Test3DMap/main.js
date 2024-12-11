@@ -216,7 +216,6 @@ function drawMap(scene, json) {
   } );
     
     const curveObject = new THREE.Line( geometry, material );
-    console.log(curveObject)
     scene.add(curveObject)
   })
 
