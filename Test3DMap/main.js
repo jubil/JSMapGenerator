@@ -93,7 +93,7 @@ new GLTFLoader().load("Soldier.glb", (gltf) => {
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 orbitControls.enableDamping = true;
 orbitControls.minDistance = 3;
-orbitControls.maxDistance = 5;
+orbitControls.maxDistance = 15;
 orbitControls.enablePan = true;
 orbitControls.maxPolarAngle = Math.PI / 2 - 0.05;
 orbitControls.update();

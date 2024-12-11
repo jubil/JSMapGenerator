@@ -18,7 +18,7 @@ export class CharacterControls {
 
   //
   fadeDuration = 0.5;
-  runVelocity = 5;
+  runVelocity = 35;
   walkVelocity = 2;
 
   constructor(model, mixer, animationMap, orbitControl, camera, currentAction) {
