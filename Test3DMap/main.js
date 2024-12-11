@@ -164,7 +164,6 @@ function drawMap(scene, json) {
     const geometry = new THREE.ShapeGeometry(shape);
     geometry.rotateX(Math.PI / 2);
 
-    
     let material
     if(tile.biome.id == 20){
       material = new THREE.MeshStandardMaterial({
@@ -198,6 +197,29 @@ function drawMap(scene, json) {
 
     scene.add(mesh);
   });
+
+  json.routes.forEach(route => {
+    const hauteurRoutes = 0.05
+    const curve = new THREE.CubicBezierCurve3(
+      new THREE.Vector3( route.p1[0], hauteurRoutes, route.p1[1] ),
+      new THREE.Vector3( route.p2[0], hauteurRoutes, route.p2[1] ),
+      new THREE.Vector3( route.p3[0], hauteurRoutes, route.p3[1] ),
+      new THREE.Vector3( route.p4[0], hauteurRoutes, route.p4[1] )
+    );
+    
+    const points = curve.getPoints( 50 );
+    const geometry = new THREE.BufferGeometry().setFromPoints( points );
+    
+    const material = new THREE.LineBasicMaterial( {
+      color: 0xffff00
+  } );
+    
+    // Create the final object to add to the scene
+    const curveObject = new THREE.Line( geometry, material );
+    console.log(curveObject)
+    scene.add(curveObject)
+  })
+
 }
 
 // TODO Remplacer bouchon. Mettre dans un autre fichier
