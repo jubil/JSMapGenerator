@@ -21,9 +21,6 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Load Map
-drawMap(scene, generateMapJson());
-
 //
 /* const capsule = new THREE.Mesh(
   new THREE.CapsuleGeometry(4, 8, 2, 10),
@@ -41,7 +38,7 @@ dirLight.position.set(1.5, 3, 2.5);
 scene.add(dirLight);
 
 // sky
-const textureCiel = new THREE.TextureLoader().load("sky.jpg");
+const textureCiel = new THREE.TextureLoader().load("textures/sky.jpg");
 textureCiel.wrapS = THREE.RepeatWrapping;
 textureCiel.wrapT = THREE.RepeatWrapping;
 textureCiel.repeat.set(1, 1);
@@ -54,9 +51,28 @@ const sphereCiel = new THREE.Mesh(
 );
 scene.add(sphereCiel);
 
+// Textures biomes
+const textureGrass = new THREE.TextureLoader().load("textures/grass.jpg");
+textureGrass.wrapS = THREE.RepeatWrapping;
+textureGrass.wrapT = THREE.RepeatWrapping;
+textureGrass.repeat.set(0.8, 0.8);
+
+const textureWater = new THREE.TextureLoader().load("textures/water.jpg");
+textureWater.wrapS = THREE.RepeatWrapping;
+textureWater.wrapT = THREE.RepeatWrapping;
+textureWater.repeat.set(0.8, 0.8);
+
+const textureDirt = new THREE.TextureLoader().load("textures/dirt.jpg");
+textureDirt.wrapS = THREE.RepeatWrapping;
+textureDirt.wrapT = THREE.RepeatWrapping;
+textureDirt.repeat.set(0.8, 0.8);
+
 // helpers
 //scene.add(new THREE.GridHelper(1000, 1000));
 scene.add(new THREE.AxesHelper(50));
+
+// Load Map
+drawMap(scene, generateMapJson());
 
 // Player
 let characterControls;
@@ -148,11 +164,35 @@ function drawMap(scene, json) {
     const geometry = new THREE.ShapeGeometry(shape);
     geometry.rotateX(Math.PI / 2);
 
-    const material = new THREE.MeshBasicMaterial({
-      color: tile.color,
-      //wireframe: true,
-      side: THREE.DoubleSide,
-    });
+    
+    let material
+    if(tile.biome.id == 20){
+      material = new THREE.MeshStandardMaterial({
+        map: textureGrass,
+        //wireframe: true,
+        side: THREE.BackSide,
+      });
+    }else if(tile.biome.id == 10){
+      material = new THREE.MeshStandardMaterial({
+        map: textureDirt,
+        //wireframe: true,
+        side: THREE.BackSide,
+      });
+    }else if(tile.biome.id == 0){
+      material = new THREE.MeshStandardMaterial({
+        map: textureWater,
+        //wireframe: true,
+        side: THREE.BackSide,
+      });
+    }
+    else {
+      material = new THREE.MeshStandardMaterial({
+        color: tile.color,
+        side: THREE.BackSide,
+      });
+    }
+    //material.wireframe = true;
+    
     const mesh = new THREE.Mesh(geometry, material);
     //mesh.position.y = tile.biome.altitude * 100 -100;
 
