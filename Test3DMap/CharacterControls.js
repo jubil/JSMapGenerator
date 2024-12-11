@@ -70,7 +70,9 @@ export class CharacterControls {
     );
 
     let play;
-    if (directionPressed && this.toogleRun) {
+    if(keysPressed["t"]){
+      play = "TPose";
+    }else if (directionPressed && this.toogleRun) {
       play = "Run";
     } else if (directionPressed && !this.toogleRun) {
       play = "Walk";
