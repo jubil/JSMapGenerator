@@ -206,8 +206,9 @@ function drawMap(scene, json) {
     //mesh.position.y = tile.biome.altitude * 100 -100;
 
     // Test élévation montagnes
-    if(tile.biome.id >= 10 && tile.biome.id <= 12){
-      //mesh.position.y = 10
+    if(tile.biome.id == 10){
+      mesh.position.y = tile.biome.altitude * 25;
+    } else if(tile.biome.id >= 11 && tile.biome.id <= 12){
       mesh.position.y = tile.biome.altitude * 30;
     }else if(tile.biome.id == 0){
       mesh.position.y = 0;
