@@ -590,7 +590,7 @@ function pathfinding_old(idTuileDebut, idTuileFin) {
   return path;
 }
 
-//TODO (Dijkstra)
+//(Dijkstra)
 function pathfinding(idTuileDebut, idTuileFin, biomesAutorises) {
   if(!biomesAutorises){
     biomesAutorises = [10, 20, 21]
