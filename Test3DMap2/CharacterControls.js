@@ -92,8 +92,6 @@ export class CharacterControls {
 
     this.mixer.update(delta);
 
-
-
     let angleYCameraDirection = Math.atan2(
       this.camera.position.x - this.model.position.x,
       this.camera.position.z - this.model.position.z

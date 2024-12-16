@@ -142,7 +142,11 @@ function animate() {
       new THREE.Vector3(0, -1, 0)
     );
     //intersects.filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].object.material.color.set(0xff0000);
+    const oldPos = playerModel.position.y
     playerModel.position.y = raycaster.intersectObjects(scene.children).filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].point.y
+    if(playerModel.position.y != oldPos){
+      camera.position.y += playerModel.position.y - oldPos
+    }
   }
   //
 
