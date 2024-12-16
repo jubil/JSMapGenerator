@@ -142,7 +142,12 @@ function animate() {
     );
     //intersects.filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].object.material.color.set(0xff0000);
     const oldPos = playerModel.position.y
-    playerModel.position.y = raycaster.intersectObjects(scene.children).filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].point.y
+    const intersectionTerrain = raycaster.intersectObjects(scene.children).filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0];
+    if(intersectionTerrain){
+      playerModel.position.y = intersectionTerrain.point.y
+    }else {
+      playerModel.position.y = -50
+    }
     if(playerModel.position.y != oldPos){
       camera.position.y += playerModel.position.y - oldPos
     }
