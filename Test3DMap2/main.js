@@ -9,8 +9,8 @@ let VIEW_DISTANCE = 1000;
 let CHARACTER_SIZE = 8;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x82c8e5);
-scene.fog = new THREE.Fog( 0xcccccc, 50, 900 );
+//scene.background = new THREE.Color(0x82c8e5);
+scene.fog = new THREE.Fog(0xcccccc, 50, 900);
 
 const camera = new THREE.PerspectiveCamera(
   FOV,
@@ -70,13 +70,9 @@ drawMap(scene, generateMapJson());
 
 // Player
 let characterControls;
+let playerModel;
 new GLTFLoader().load("Soldier.glb", (gltf) => {
-  const playerModel = gltf.scene;
-  /*   model.traverse(object => {
-    if(object.isMesh){
-      object.castShadow = true;
-    }
-  }) */
+  playerModel = gltf.scene;
   scene.add(playerModel);
 
   const gltfAnimations = gltf.animations;
@@ -85,10 +81,9 @@ new GLTFLoader().load("Soldier.glb", (gltf) => {
 
   //console.log("Animations Personnage", gltfAnimations)
 
-  gltfAnimations
-    .forEach((a) => {
-      animationMap.set(a.name, mixer.clipAction(a));
-    });
+  gltfAnimations.forEach((a) => {
+    animationMap.set(a.name, mixer.clipAction(a));
+  });
   characterControls = new CharacterControls(
     playerModel,
     mixer,
@@ -98,10 +93,9 @@ new GLTFLoader().load("Soldier.glb", (gltf) => {
     "Idle"
   );
 
-  playerModel.position.x = 500
-  playerModel.position.y = 3
-  playerModel.position.z = 500
-
+  // Commencer au milieu de la map
+  playerModel.position.x = 500;
+  playerModel.position.z = 500;
 });
 
 // Controls
@@ -134,12 +128,23 @@ document.addEventListener(
 );
 
 // UPDATE METHODE
-const clock = new THREE.Clock()
+const clock = new THREE.Clock();
 function animate() {
   let mixerUpdateDelta = clock.getDelta();
-  if(characterControls){
-    characterControls.update(mixerUpdateDelta, keysPressed)
+  if (characterControls) {
+    characterControls.update(mixerUpdateDelta, keysPressed);
   }
+
+  // Raycasting pour positionner le joueur
+  if (playerModel) {
+    const raycaster = new THREE.Raycaster(
+      new THREE.Vector3(playerModel.position.x, 60, playerModel.position.z),
+      new THREE.Vector3(0, -1, 0)
+    );
+    //intersects.filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].object.material.color.set(0xff0000);
+    playerModel.position.y = raycaster.intersectObjects(scene.children).filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].point.y
+  }
+  //
 
   sphereCiel.position.x = camera.position.x;
   sphereCiel.position.y = camera.position.y;
@@ -163,37 +168,32 @@ function drawMap(scene, json) {
     const extrudeSettings = {
       //steps: 2,
       depth: 50,
-      bevelEnabled: false,
-      bevelThickness: 1,
-      bevelSize: 1,
-      bevelOffset: 0,
-      bevelSegments: 1
+      bevelEnabled: false
     };
 
-    const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     geometry.rotateX(Math.PI / 2);
 
-    let material
-    if(tile.biome.id == 20){
+    let material;
+    if (tile.biome.id == 20) {
       material = new THREE.MeshStandardMaterial({
         map: textureGrass,
         //wireframe: true,
         side: THREE.FrontSide,
       });
-    }else if(tile.biome.id == 10){
+    } else if (tile.biome.id == 10) {
       material = new THREE.MeshStandardMaterial({
         map: textureDirt,
         //wireframe: true,
         side: THREE.FrontSide,
       });
-    }else if(tile.biome.id == 0){
+    } else if (tile.biome.id == 0) {
       material = new THREE.MeshStandardMaterial({
         map: textureWater,
         //wireframe: true,
         side: THREE.FrontSide,
       });
-    }
-    else {
+    } else {
       material = new THREE.MeshStandardMaterial({
         color: tile.color,
         side: THREE.FrontSide,
@@ -201,48 +201,62 @@ function drawMap(scene, json) {
       });
     }
     //material.wireframe = true;
-    
+
     const mesh = new THREE.Mesh(geometry, material);
     //mesh.position.y = tile.biome.altitude * 100 -100;
 
     // Test élévation montagnes
-    if(tile.biome.id == 10){
+    if (tile.biome.id == 10) {
       mesh.position.y = tile.biome.altitude * 25;
-    } else if(tile.biome.id >= 11 && tile.biome.id <= 12){
+    } else if (tile.biome.id >= 11 && tile.biome.id <= 12) {
       mesh.position.y = tile.biome.altitude * 30;
-    }else if(tile.biome.id == 0){
+    } else if (tile.biome.id == 0) {
       mesh.position.y = 0;
-    }else {
-      mesh.position.y = tile.biome.altitude * 5
+    } else {
+      mesh.position.y = tile.biome.altitude * 5;
     }
 
     scene.add(mesh);
   });
 
   // Trace les routes
-  json.tiles.forEach(t => {
-    t.routes.forEach(route => {
-      const hauteurRoutes = 0.02
+  json.tiles.forEach((t) => {
+    t.routes.forEach((route) => {
+      const hauteurRoutes = 0.02;
       const curve = new THREE.CubicBezierCurve3(
-        new THREE.Vector3( route.p1[0], t.biome.altitude * 5 + hauteurRoutes, route.p1[1] ),
-        new THREE.Vector3( route.p2[0], t.biome.altitude * 5 + hauteurRoutes, route.p2[1] ),
-        new THREE.Vector3( route.p3[0], t.biome.altitude * 5 + hauteurRoutes, route.p3[1] ),
-        new THREE.Vector3( route.p4[0], t.biome.altitude * 5 + hauteurRoutes, route.p4[1] )
+        new THREE.Vector3(
+          route.p1[0],
+          t.biome.altitude * 5 + hauteurRoutes,
+          route.p1[1]
+        ),
+        new THREE.Vector3(
+          route.p2[0],
+          t.biome.altitude * 5 + hauteurRoutes,
+          route.p2[1]
+        ),
+        new THREE.Vector3(
+          route.p3[0],
+          t.biome.altitude * 5 + hauteurRoutes,
+          route.p3[1]
+        ),
+        new THREE.Vector3(
+          route.p4[0],
+          t.biome.altitude * 5 + hauteurRoutes,
+          route.p4[1]
+        )
       );
-      
-      const points = curve.getPoints( 50 );
-      const geometry = new THREE.BufferGeometry().setFromPoints( points );
-      
-      const material = new THREE.LineBasicMaterial( {
-        color: 0xffff00
-    } );
-      
-      const curveObject = new THREE.Line( geometry, material );
-      scene.add(curveObject)
-    })
-  })
 
+      const points = curve.getPoints(50);
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
+      const material = new THREE.LineBasicMaterial({
+        color: 0xffff00,
+      });
+
+      const curveObject = new THREE.Line(geometry, material);
+      scene.add(curveObject);
+    });
+  });
 }
 
 // TODO Remplacer bouchon. Mettre dans un autre fichier
