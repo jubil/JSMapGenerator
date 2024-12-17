@@ -4,9 +4,10 @@ import { GLTFLoader } from "../libs/three/addons/loaders/GLTFLoader.js";
 import { CharacterControls } from "./CharacterControls.js";
 import { MapGenerator } from "./MapGenerator.js";
 
+import { VOXLoader, VOXMesh } from "../libs/three/addons/loaders/VOXLoader.js";
+
 let FOV = 80;
 let VIEW_DISTANCE = 1000;
-let CHARACTER_SIZE = 8;
 
 const scene = new THREE.Scene();
 //scene.background = new THREE.Color(0x82c8e5);
@@ -28,7 +29,7 @@ scene.add(new THREE.HemisphereLight(0xfbfdd3, 0x444444, 1.5));
 
 const dirLight = new THREE.DirectionalLight(0xffffff, 2);
 dirLight.position.set(500, 15, 500);
-dirLight.rotateX(60)
+dirLight.rotateX(60);
 scene.add(dirLight);
 
 // sky
@@ -113,6 +114,9 @@ document.addEventListener(
   (e) => {
     if (e.shiftKey && characterControls) {
       characterControls.switchRunToogle();
+    } else if (e.key == "b") {
+      // Build button
+      spawnBatiment(playerModel.position);
     } else {
       keysPressed[e.key.toLocaleLowerCase()] = true;
     }
@@ -142,15 +146,21 @@ function animate() {
       new THREE.Vector3(0, -1, 0)
     );
     //intersects.filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].object.material.color.set(0xff0000);
-    const oldPos = playerModel.position.y
-    const intersectionTerrain = raycaster.intersectObjects(scene.children).filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0];
-    if(intersectionTerrain){
-      playerModel.position.y = intersectionTerrain.point.y
-    }else {
-      playerModel.position.y = -50
+    const oldPos = playerModel.position.y;
+    const intersectionTerrain = raycaster
+      .intersectObjects(scene.children)
+      .filter(
+        (i) =>
+          i.object instanceof THREE.Mesh &&
+          i.object.geometry instanceof THREE.ExtrudeGeometry
+      )[0];
+    if (intersectionTerrain) {
+      playerModel.position.y = intersectionTerrain.point.y;
+    } else {
+      playerModel.position.y = -50;
     }
-    if(playerModel.position.y != oldPos){
-      camera.position.y += playerModel.position.y - oldPos
+    if (playerModel.position.y != oldPos) {
+      camera.position.y += playerModel.position.y - oldPos;
     }
   }
   //
@@ -177,7 +187,7 @@ function drawMap(scene, json) {
     const extrudeSettings = {
       //steps: 2,
       depth: 50,
-      bevelEnabled: false
+      bevelEnabled: false,
     };
 
     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -271,4 +281,28 @@ function drawMap(scene, json) {
 // TODO Remplacer bouchon. Mettre dans un autre fichier
 function generateMapJson() {
   return JSON.parse(new MapGenerator().generate());
+}
+
+// DEBUG
+function spawnBatiment(position) {
+  const loader = new VOXLoader();
+
+  let meshVOX;
+  loader.load("1.vox", function (chunks) {
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+
+      meshVOX = new VOXMesh(chunk);
+      meshVOX.scale.setScalar(0.15);
+      meshVOX.position.x = position.x
+      meshVOX.position.y = position.y + 2.3
+      meshVOX.position.z = position.z
+      meshVOX.rotateY(Math.random()*180)
+
+      console.log(meshVOX, position);
+
+      scene.add(meshVOX);
+    }
+  });
+
 }
