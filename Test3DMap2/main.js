@@ -288,7 +288,7 @@ function spawnBatiment(position) {
   const loader = new VOXLoader();
 
   let meshVOX;
-  loader.load("1.vox", function (chunks) {
+  loader.load("vox/scirie.vox", function (chunks) {
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
 
