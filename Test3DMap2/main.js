@@ -24,10 +24,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // light
-scene.add(new THREE.HemisphereLight(0xcccccc, 0x444444, 3));
+scene.add(new THREE.HemisphereLight(0xfbfdd3, 0x444444, 1.5));
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 2.5);
-dirLight.position.set(1.5, 300, 2.5);
+const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+dirLight.position.set(500, 15, 500);
+dirLight.rotateX(60)
 scene.add(dirLight);
 
 // sky
