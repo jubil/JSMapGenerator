@@ -6,6 +6,7 @@ export class CharacterControls {
   animationMap = new Map();
   orbitControl;
   camera;
+  scene;
 
   toogleRun = false;
   currentAction;
@@ -21,7 +22,15 @@ export class CharacterControls {
   runVelocity = 35;
   walkVelocity = 2;
 
-  constructor(model, mixer, animationMap, orbitControl, camera, currentAction) {
+  constructor(
+    model,
+    mixer,
+    animationMap,
+    orbitControl,
+    camera,
+    scene,
+    currentAction
+  ) {
     this.model = model;
     this.mixer = mixer;
     this.animationMap = animationMap;
@@ -34,6 +43,7 @@ export class CharacterControls {
     });
     this.orbitControl = orbitControl;
     this.camera = camera;
+    this.scene = scene;
   }
 
   switchRunToogle = () => {
@@ -70,9 +80,9 @@ export class CharacterControls {
     );
 
     let play;
-    if(keysPressed["t"]){
+    if (keysPressed["t"]) {
       play = "TPose";
-    }else if (directionPressed && this.toogleRun) {
+    } else if (directionPressed && this.toogleRun) {
       play = "Run";
     } else if (directionPressed && !this.toogleRun) {
       play = "Walk";
@@ -92,48 +102,74 @@ export class CharacterControls {
 
     this.mixer.update(delta);
 
+    // Raycasting pour positionner le joueur
+    if (this.model) {
+      const raycaster = new THREE.Raycaster(
+        new THREE.Vector3(this.model.position.x, 60, this.model.position.z),
+        new THREE.Vector3(0, -1, 0)
+      );
+      //intersects.filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].object.material.color.set(0xff0000);
+      const oldPos = this.model.position.y;
+      const intersectionTerrain = raycaster
+        .intersectObjects(this.scene.children)
+        .filter(
+          (i) =>
+            i.object instanceof THREE.Mesh &&
+            i.object.geometry instanceof THREE.ExtrudeGeometry
+        )[0];
+      if (intersectionTerrain) {
+        this.model.position.y = intersectionTerrain.point.y;
+      } else {
+        this.model.position.y = -50;
+      }
+      if (this.model.position.y != oldPos) {
+        this.camera.position.y += this.model.position.y - oldPos;
+      }
+    }
+    //
+
     let angleYCameraDirection = Math.atan2(
       this.camera.position.x - this.model.position.x,
       this.camera.position.z - this.model.position.z
     );
 
     // rotate model
-    let direction = this.directionOffset(keysPressed)
+    let direction = this.directionOffset(keysPressed);
     this.rotateQuarternion.setFromAxisAngle(
       this.rotateAngle,
       angleYCameraDirection + direction
     );
     this.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2);
-    
+
     // calculate direction
-    this.camera.getWorldDirection(this.walkDirection)
-    this.walkDirection.y = 0
-    this.walkDirection.normalize()
-    this.walkDirection.applyAxisAngle(this.rotateAngle, direction)
+    this.camera.getWorldDirection(this.walkDirection);
+    this.walkDirection.y = 0;
+    this.walkDirection.normalize();
+    this.walkDirection.applyAxisAngle(this.rotateAngle, direction);
 
     let velocity = 0;
-    if(this.currentAction == 'Run'){
-      velocity = this.runVelocity
-    }else if(this.currentAction == 'Walk'){
-      velocity = this.walkVelocity
-    }  
+    if (this.currentAction == "Run") {
+      velocity = this.runVelocity;
+    } else if (this.currentAction == "Walk") {
+      velocity = this.walkVelocity;
+    }
 
     // move model
-    const moveX = this.walkDirection.x * velocity * delta
-    const moveZ = this.walkDirection.z * velocity * delta
-    
-    this.model.position.x += moveX
-    this.model.position.z += moveZ
+    const moveX = this.walkDirection.x * velocity * delta;
+    const moveZ = this.walkDirection.z * velocity * delta;
+
+    this.model.position.x += moveX;
+    this.model.position.z += moveZ;
 
     // move camera
-    this.camera.position.x += moveX
-    this.camera.position.z += moveZ
+    this.camera.position.x += moveX;
+    this.camera.position.z += moveZ;
 
     // update camera target
-    this.cameraTarget.x = this.model.position.x
-    this.cameraTarget.y = this.model.position.y + 1.5
-    this.cameraTarget.z = this.model.position.z
+    this.cameraTarget.x = this.model.position.x;
+    this.cameraTarget.y = this.model.position.y + 1.5;
+    this.cameraTarget.z = this.model.position.z;
 
-    this.orbitControl.target = this.cameraTarget
+    this.orbitControl.target = this.cameraTarget;
   };
 }
