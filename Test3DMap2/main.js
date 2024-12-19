@@ -62,6 +62,11 @@ textureDirt.wrapS = THREE.RepeatWrapping;
 textureDirt.wrapT = THREE.RepeatWrapping;
 textureDirt.repeat.set(0.8, 0.8);
 
+const textureCobble = new THREE.TextureLoader().load("textures/cobble.png");
+textureCobble.wrapS = THREE.RepeatWrapping;
+textureCobble.wrapT = THREE.RepeatWrapping;
+textureCobble.repeat.set(0.5, 0.5);
+
 // helpers
 //scene.add(new THREE.GridHelper(1000, 1000));
 scene.add(new THREE.AxesHelper(50));
@@ -80,8 +85,6 @@ new GLTFLoader().load("Soldier.glb", (gltf) => {
   const mixer = new THREE.AnimationMixer(playerModel);
   const animationMap = new Map();
 
-  //console.log("Animations Personnage", gltfAnimations)
-
   gltfAnimations.forEach((a) => {
     animationMap.set(a.name, mixer.clipAction(a));
   });
@@ -91,6 +94,7 @@ new GLTFLoader().load("Soldier.glb", (gltf) => {
     animationMap,
     orbitControls,
     camera,
+    scene,
     "Idle"
   );
 
@@ -139,32 +143,6 @@ function animate() {
     characterControls.update(mixerUpdateDelta, keysPressed);
   }
 
-  // Raycasting pour positionner le joueur
-  if (playerModel) {
-    const raycaster = new THREE.Raycaster(
-      new THREE.Vector3(playerModel.position.x, 60, playerModel.position.z),
-      new THREE.Vector3(0, -1, 0)
-    );
-    //intersects.filter(i => i.object instanceof THREE.Mesh && i.object.geometry instanceof THREE.ExtrudeGeometry)[0].object.material.color.set(0xff0000);
-    const oldPos = playerModel.position.y;
-    const intersectionTerrain = raycaster
-      .intersectObjects(scene.children)
-      .filter(
-        (i) =>
-          i.object instanceof THREE.Mesh &&
-          i.object.geometry instanceof THREE.ExtrudeGeometry
-      )[0];
-    if (intersectionTerrain) {
-      playerModel.position.y = intersectionTerrain.point.y;
-    } else {
-      playerModel.position.y = -50;
-    }
-    if (playerModel.position.y != oldPos) {
-      camera.position.y += playerModel.position.y - oldPos;
-    }
-  }
-  //
-
   sphereCiel.position.x = camera.position.x;
   sphereCiel.position.y = camera.position.y;
   sphereCiel.position.z = camera.position.z;
@@ -211,6 +189,14 @@ function drawMap(scene, json) {
         map: textureWater,
         //wireframe: true,
         side: THREE.FrontSide,
+      });
+    } else if (tile.biome.id == 21) {
+      material = new THREE.MeshStandardMaterial({
+        map: textureCobble,
+        side: THREE.FrontSide,
+        //transparent: true,
+        //opacity: 0.4
+        //wireframe: true
       });
     } else {
       material = new THREE.MeshStandardMaterial({
@@ -276,6 +262,17 @@ function drawMap(scene, json) {
       scene.add(curveObject);
     });
   });
+
+  // WIP Place les batiments
+  json.tiles.forEach((t) => {
+    t.building.forEach((b) => {
+      //console.log(b)
+      // TODO Magic number : t.biome.altitude est normalisé. 5 est le multiplicateur d'altitude du biome de plaine
+      spawnBatiment(
+        new THREE.Vector3(b.center[0], t.biome.altitude * 5, b.center[1])
+      );
+    });
+  });
 }
 
 // TODO Remplacer bouchon. Mettre dans un autre fichier
@@ -288,21 +285,60 @@ function spawnBatiment(position) {
   const loader = new VOXLoader();
 
   let meshVOX;
-  loader.load("vox/scirie.vox", function (chunks) {
+  //loader.load("vox/0.vox", function (chunks) {
+  loader.load("vox/town_center_0.vox", function (chunks) {
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
 
       meshVOX = new VOXMesh(chunk);
-      meshVOX.scale.setScalar(0.15);
-      meshVOX.position.x = position.x
-      meshVOX.position.y = position.y + 2.3
-      meshVOX.position.z = position.z
-      meshVOX.rotateY(Math.random()*180)
 
-      console.log(meshVOX, position);
+      const scale = 0.15;
+      const rotation = Math.random() * Math.PI * 2;
+      meshVOX.scale.setScalar(scale);
 
+      meshVOX.position.x = position.x;
+      meshVOX.position.y = position.y + (chunk.size.z / 2) * scale;
+      meshVOX.position.z = position.z;
+
+      meshVOX.rotateY(rotation);
       scene.add(meshVOX);
+      
+      // hitbox
+/*       const hitbox = new THREE.Mesh(
+        new THREE.BoxGeometry(chunk.size.x, 1, chunk.size.y + 2),
+        new THREE.MeshStandardMaterial({
+          color: "#ffffff",
+        })
+      );
+      hitbox.scale.setScalar(scale);
+      hitbox.position.x = position.x;
+      hitbox.position.y = position.y + scale / 2;
+      hitbox.position.z = position.z;
+      hitbox.rotateY(rotation);
+      scene.add(hitbox); */ 
+      //console.log(hitbox)
+      
+/*       let coins = [
+        new THREE.Vector2( chunk.size.x * scale/2, chunk.size.y * scale/2),
+        new THREE.Vector2( -chunk.size.x * scale/2, chunk.size.y * scale/2),
+        new THREE.Vector2( chunk.size.x * scale/2, -chunk.size.y * scale/2),
+        new THREE.Vector2( -chunk.size.x * scale/2, -chunk.size.y * scale/2),
+      ]
+      coins.forEach((c) => {
+        c.rotateAround(new THREE.Vector2(0,0), -rotation).add(new THREE.Vector2( position.x, position.z ))
+        //c.applyAxisAngle(new THREE.Vector3(0,1,0), rotation)
+        //c.add(new THREE.Vector2( position.x, position.z ))
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 10), new THREE.MeshStandardMaterial({
+          color: "#ffff00",
+        }));
+        mesh.position.x = c.x
+        mesh.position.y = position.y + scale
+        mesh.position.z = c.y
+        scene.add(mesh)
+      }) */
+      //console.log(coins)
+
+      
     }
   });
-
 }

@@ -89,6 +89,7 @@ export class MapGenerator {
         color: generateColorFromBiomeId(biome),
         centre: centre,
         routes: [],
+        building: [],
         biome: {
           id: biome,
           altitude: altitude,
@@ -251,6 +252,16 @@ export class MapGenerator {
         });
       });
 
+// Génération de batiments sur les tuiles de village
+  tuileDeVillePotentielles.forEach(t => {
+    t.building.push({
+      type: "TOWN_CENTER",
+      center: t.centre
+    });
+  })
+//
+
+
     return JSON.stringify(json);
   }
 }
@@ -326,6 +337,7 @@ const forceBorders = (idBiome) => {
 function calculDistance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
+
 function calculCentre(x1, y1, x2, y2) {
   return [0.5 * (x1 + x2), 0.5 * (y1 + y2)];
 }
